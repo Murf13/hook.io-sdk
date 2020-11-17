@@ -1,0 +1,41 @@
+const line = require('@line/bot-sdk');
+const express = require('express');
+const axios = require('axios');
+
+const config = {
+  channelAccessToken: "8mrcp4ZtQoOA0zZTmHat/24CyC2xEIRYuVZ3H7eRCGS8g8yATwWj9dNRa9xqbmPVA/JYSRB1uT9RlQMRhllT0NZT8u8RdYxcQ8jpCmiGxVH2ZR2BABkn4B11hmvodBuIXJ+Q038L7qKDE2EqMsSpSQdB04t89/1O/w1cDnyilFU=",
+  channelSecret: "cb95e6d5fdf385f3e50d135a404238be",
+};
+
+// create LINE SDK client
+const client = new line.Client(config);
+const app = express();
+
+// register a webhook handler with middleware
+// about the middleware, please refer to doc
+app.post('/callback', line.middleware(config), (req, res) => {
+  Promise
+    .all(req.body.events.map(handleEvent))
+    .then((result) => res.json(result))
+    .catch((e)=>{
+      console.log(e);
+    });
+
+});
+
+function handleEvent(event) {
+  
+    if(event.message.text == "bot"){
+      const echo = { type: 'text', text: "Halo juga goblok :)·" };
+      return client.replyMessage(event.replyToken, echo);
+    }
+
+    const echo = { type: 'text', text: "Saya tidak mengerti, saya simpan dulu" };
+    return client.replyMessage(event.replyToken, echo);
+}
+
+// listen on port
+const port = 3000;
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
+});
